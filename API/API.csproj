@@ -5,16 +5,13 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DocumentationFile>bin\Debug\API.xml</DocumentationFile>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <DocumentationFile>bin\Debug\netcoreapp2.2\API.xml</DocumentationFile>
     </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DocumentationFile>bin\Release\API.xml</DocumentationFile>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <DebugType></DebugType>
+      <DocumentationFile>bin\Release\netcoreapp2.2\API.xml</DocumentationFile>
     </PropertyGroup>
-
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
@@ -27,4 +24,8 @@
       <ProjectReference Include="..\ModelConverters\ModelConverters.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helpers\" />
+      <Folder Include="Controllers\" />
+    </ItemGroup>
 </Project>

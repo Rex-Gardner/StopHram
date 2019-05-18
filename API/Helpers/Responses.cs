@@ -5,12 +5,12 @@ namespace API.Helpers
 {
     public static class Responses
     {
-        public static ResponseService Ok(string target)
+        public static Response Ok(string target)
         {
-            return new ResponseService
+            return new Response
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Error = new ServiceResponse
+                Responce = new ResponseDetails
                 {
                     Code = System.Net.HttpStatusCode.OK.ToString(),
                     Message = ResponseCodes.Ok,
@@ -19,12 +19,12 @@ namespace API.Helpers
             };
         }
 
-        public static ResponseService BodyIsMissing(string target)
+        public static Response BodyIsMissing(string target)
         {
-            return new ResponseService
+            return new Response
             {
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Error = new ServiceResponse
+                Responce = new ResponseDetails
                 {
                     Code = System.Net.HttpStatusCode.BadRequest.ToString(),
                     Message = ResponseCodes.BadRequest,
@@ -33,12 +33,12 @@ namespace API.Helpers
             };
         }
 
-        public static ResponseService InvalidImageData(string target)
+        public static Response InvalidImageData(string target)
         {
-            return new ResponseService
+            return new Response
             {
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Error = new ServiceResponse
+                Responce = new ResponseDetails
                 {
                     Code = System.Net.HttpStatusCode.BadRequest.ToString(),
                     Message = ResponseCodes.BadRequest,

@@ -12,20 +12,12 @@ using Model = ClientModels.Picture;
 
 namespace API.Controllers
 {
-    [ApiController]
-    public class UploadHelper
+    public static class UploadHelper
     {
-        IHostingEnvironment _hostingEnvironment;
-
-        public UploadHelper(IHostingEnvironment hostingEnvironment)
-        {
-            _hostingEnvironment = hostingEnvironment;
-        }
-
-        public async Task<ResponseService> UploadPictureAsync(string id, IFormFile picture, CancellationToken cancellationToken)
+        public static async Task<Response> UploadPictureAsync(string id, string path, IFormFile picture, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ResponseService response;
+            Response response;
 
             if (id == null)
             {
@@ -40,13 +32,11 @@ namespace API.Controllers
             }
 
             const int maxFileLength = 1024 * 512;
-            var extension = Path.GetExtension(picture.FileName);
-            var path = $"/pictures/{id}{extension}";
             var stream = picture.OpenReadStream();
 
             if (picture.Length > 0 && picture.Length <= maxFileLength && ImageValidation.IsImage(stream))
             {
-                using (var fileStream = new FileStream($"{_hostingEnvironment.WebRootPath}{path}", FileMode.Create))
+                using (var fileStream = new FileStream(path, FileMode.Create))
                 {
                     await picture.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
                 }
