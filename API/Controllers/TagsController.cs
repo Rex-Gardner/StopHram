@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Models.Tags.Exceptions;
 using Models.Tags.Repositories;
@@ -36,8 +37,8 @@ namespace API.Controllers
 
             if (creationInfo == null)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(creationInfo));
+                return BadRequest(error);
             }
 
             var modelCreationInfo = Converter.TagCreationInfoConverter.Convert(creationInfo);
@@ -50,8 +51,8 @@ namespace API.Controllers
             }
             catch (TagDuplicationException ex)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest(ex.Message);
+                var error = Responses.DuplicationError(ex.Message, "Tag");
+                return BadRequest(error);
             }
 
             var clientTag = Converter.TagConverter.Convert(modelTag);
@@ -92,8 +93,8 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Tag");
+                return NotFound(error);
             }
 
             var clientTag = Converter.TagConverter.Convert(modelTag);
@@ -115,8 +116,8 @@ namespace API.Controllers
 
             if (patchInfo == null)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(patchInfo));
+                return BadRequest(error);
             }
 
             var modelPatchInfo = Converter.TagPatchInfoConveter.Convert(id, patchInfo);
@@ -128,8 +129,8 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Tag");
+                return NotFound(error);
             }
 
             var clientTag = Converter.TagConverter.Convert(modelTag);
@@ -153,8 +154,8 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Tag");
+                return NotFound(error);
             }
 
             return NoContent();

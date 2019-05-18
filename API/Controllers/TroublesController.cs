@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Models.Troubles.Exceptions;
 using Models.Troubles.Repositories;
@@ -37,8 +38,8 @@ namespace API.Controllers
 
             if (creationInfo == null)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(creationInfo));
+                return BadRequest(error);
             }
 
             var modelCreationInfo = Converter.TroubleCreationInfoConverter.Convert(creationInfo);
@@ -51,8 +52,8 @@ namespace API.Controllers
             }
             catch (TroubleDuplicationException ex)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest(ex.Message);
+                var error = Responses.DuplicationError(ex.Message, "Trouble");
+                return BadRequest(error);
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
@@ -100,8 +101,8 @@ namespace API.Controllers
             }
             catch (InvalidDataException ex)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest(ex.Message);
+                var error = Responses.InvalidId(ex.Message, "Trouble");
+                return BadRequest(error);
             }
             
             Model.Trouble modelTrouble;
@@ -112,8 +113,8 @@ namespace API.Controllers
             }
             catch (TroubleNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Trouble");
+                return BadRequest(error);
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
@@ -135,8 +136,8 @@ namespace API.Controllers
 
             if (patchInfo == null)
             {
-                //todo Implement ErrorResponseService
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(patchInfo));
+                return BadRequest(error);
             }
 
             var modelPatchInfo = Converter.TroublePatchInfoConverter.Convert(id, patchInfo);
@@ -148,8 +149,8 @@ namespace API.Controllers
             }
             catch (TroubleNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Trouble");
+                return BadRequest(error);
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
@@ -175,8 +176,8 @@ namespace API.Controllers
             }
             catch (TroubleNotFoundException ex)
             {
-                //todo Implement ErrorResponseService
-                return NotFound(ex.Message);
+                var error = Responses.NotFoundError(ex.Message, "Trouble");
+                return BadRequest(error);
             }
 
             return NoContent();

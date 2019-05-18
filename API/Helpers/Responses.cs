@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Net;
 using ClientModels.Errors;
 
 namespace API.Helpers
 {
     public static class Responses
     {
-        public static Response Ok(string target)
+        public static Response Ok(string message, string target)
         {
             return new Response
             {
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Responce = new ResponseDetails
+                StatusCode = HttpStatusCode.OK,
+                ResponseDetails = new ResponseDetails
                 {
-                    Code = System.Net.HttpStatusCode.OK.ToString(),
-                    Message = ResponseCodes.Ok,
+                    Code = ResponseCodes.Ok,
+                    Message = message,
                     Target = target
                 }
             };
@@ -23,11 +24,39 @@ namespace API.Helpers
         {
             return new Response
             {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Responce = new ResponseDetails
+                StatusCode = HttpStatusCode.BadRequest,
+                ResponseDetails = new ResponseDetails
                 {
-                    Code = System.Net.HttpStatusCode.BadRequest.ToString(),
-                    Message = ResponseCodes.BadRequest,
+                    Code =  ResponseCodes.BadRequest,
+                    Message = "Request body is empty.",
+                    Target = target
+                }
+            };
+        }
+
+        public static Response DuplicationError(string message, string target)
+        {
+            return new Response
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                ResponseDetails = new ResponseDetails
+                {
+                    Code =  ResponseCodes.BadRequest,
+                    Message = message,
+                    Target = target
+                }
+            };
+        }
+
+        public static Response NotFoundError(string message, string target)
+        {
+            return new Response
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                ResponseDetails = new ResponseDetails
+                {
+                    Code =  ResponseCodes.NotFound,
+                    Message = message,
                     Target = target
                 }
             };
@@ -37,11 +66,25 @@ namespace API.Helpers
         {
             return new Response
             {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Responce = new ResponseDetails
+                StatusCode = HttpStatusCode.BadRequest,
+                ResponseDetails = new ResponseDetails
                 {
-                    Code = System.Net.HttpStatusCode.BadRequest.ToString(),
-                    Message = ResponseCodes.BadRequest,
+                    Code = ResponseCodes.BadRequest,
+                    Message = "Uploaded image is invalid.",
+                    Target = target
+                }
+            };
+        }
+
+        public static Response InvalidId(string message, string target)
+        {
+            return new Response
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                ResponseDetails = new ResponseDetails
+                {
+                    Code = ResponseCodes.BadRequest,
+                    Message = message,
                     Target = target
                 }
             };
