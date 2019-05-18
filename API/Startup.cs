@@ -1,4 +1,6 @@
 using System;
+using AspNetCore.Identity.Mongo;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Models.Tags.Repositories;
 using Models.Troubles.Repositories;
 using Swashbuckle.AspNetCore.Swagger;
+using Models.Roles;
+using Models.Users;
 
 namespace API
 {
@@ -20,6 +24,12 @@ namespace API
         {
             services.AddSingleton<ITagRepository, MongoTagRepository>();
             services.AddSingleton<ITroubleRepository, MongoTroubleRepository>();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            });
+            services.AddIdentityMongoDbProvider<User, Role>(mongo =>
+                mongo.ConnectionString = "mongodb://localhost:27017/UrbanIdentity");
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyPolicy"));
@@ -61,6 +71,7 @@ namespace API
             app.UseCors("AllowAnyPolicy");
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseMvc();
 
             app.UseSwagger(options => options.RouteTemplate = $"{DocsRoute}/{{documentName}}/swagger.json");
