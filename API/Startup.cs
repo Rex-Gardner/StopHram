@@ -1,14 +1,16 @@
 using System;
 using AspNetCore.Identity.Mongo;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using Models.Tags.Repositories;
+using Models.Troubles.Repositories;
+using Swashbuckle.AspNetCore.Swagger;
 using Models.Roles;
 using Models.Users;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace API
 {
@@ -20,14 +22,14 @@ namespace API
         
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddSingleton<IRepository, MongoRealisationRepository>();
+            services.AddSingleton<ITagRepository, MongoTagRepository>();
+            services.AddSingleton<ITroubleRepository, MongoTroubleRepository>();
             services.Configure<IdentityOptions>(options =>
             {
                 options.User.RequireUniqueEmail = true;
             });
             services.AddIdentityMongoDbProvider<User, Role>(mongo =>
                 mongo.ConnectionString = "mongodb://localhost:27017/UrbanIdentity");
-
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyPolicy"));
