@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,33 @@ namespace Models.Troubles.Repositories
         
         public Task<Trouble> CreateAsync(TroubleCreationInfo creationInfo, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            if (creationInfo == null)
+            {
+                throw new ArgumentNullException(nameof(creationInfo));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            //todo check TroubleDuplication
+
+            var guid = Guid.NewGuid();
+            var now = DateTime.UtcNow;    //todo Local time
+            
+            var trouble = new Trouble
+            {
+                Id = guid,
+                Name = creationInfo.Name,
+                Description = creationInfo.Description,
+                Images = creationInfo.Images,
+                Coordinates = creationInfo.Coordinates,
+                Address = creationInfo.Address,
+                Tags = creationInfo.Tags,
+                Status = creationInfo.Status,
+                CreatedAt = now,
+                LastUpdateAt = now
+            };
+
+            troubles.InsertOne(trouble, cancellationToken: cancellationToken);
+            return Task.FromResult(trouble);
         }
 
         public Task<IReadOnlyList<Trouble>> SearchAsync(TroubleSearchInfo searchInfo, CancellationToken cancellationToken)
