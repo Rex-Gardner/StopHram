@@ -163,7 +163,15 @@ namespace Models.Troubles.Repositories
 
         public Task RemoveAsync(Guid id, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            var deleteResult = troubles.DeleteOne(type => type.Id == id);
+
+            if (deleteResult.DeletedCount == 0)
+            {
+                throw new TroubleNotFoundException(id.ToString());
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

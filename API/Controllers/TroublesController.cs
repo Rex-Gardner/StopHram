@@ -155,5 +155,31 @@ namespace API.Controllers
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
             return Ok(clientTrouble);
         }
+        
+        /// <summary>
+        /// Удаляет проблему
+        /// </summary>
+        /// <param name="id">Идентификатор проблемы</param>
+        /// <param name="cancellationToken"></param>
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> DeleteTagAsync([FromRoute]string id, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var guid = Converter.TroubleConverterUtils.ConvertId(id);
+            
+            try
+            {
+                await repository.RemoveAsync(guid, cancellationToken).ConfigureAwait(false);
+            }
+            catch (TroubleNotFoundException ex)
+            {
+                //todo Implement ErrorResponseService
+                return NotFound(ex.Message);
+            }
+
+            return NoContent();
+        }
     }
 }
