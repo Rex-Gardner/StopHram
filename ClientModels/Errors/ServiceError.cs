@@ -3,9 +3,9 @@ namespace ClientModels.Errors
 {
     public class ServiceError
     {
-        string Code { get; set; }
-        string Message { get; set; }
-        string Target { get; set; }
+        public string Code { get; set; }
+        public string Message { get; set; }
+        public string Target { get; set; }
 
         public ServiceError()
         {
