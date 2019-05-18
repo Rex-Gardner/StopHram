@@ -36,7 +36,7 @@ namespace Models.Troubles.Repositories
                 Id = guid,
                 Name = creationInfo.Name,
                 Description = creationInfo.Description,
-                Images = creationInfo.Images,
+                Images = new string[0],
                 Coordinates = creationInfo.Coordinates,
                 Address = creationInfo.Address,
                 Tags = creationInfo.Tags,

@@ -25,8 +25,7 @@ namespace ModelConverters.Troubles
             }
 
             var modelCreationInfo = new Model.TroubleCreationInfo(creationInfo.Name, creationInfo.Description,
-                creationInfo.Images, coordinates[0], coordinates[1], creationInfo.Address,
-                creationInfo.Tags);
+                coordinates[0], coordinates[1], creationInfo.Address, creationInfo.Tags);
 
             return modelCreationInfo;
         }

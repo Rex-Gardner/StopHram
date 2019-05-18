@@ -12,9 +12,6 @@ namespace ClientModels.Troubles
         [DataMember(IsRequired = true)]
         public string Description { get; set; }
         
-        [DataMember(IsRequired = false)]
-        public IReadOnlyList<string> Images { get; set; }
-        
         [DataMember(IsRequired = true)]
         public IReadOnlyList<double> Coordinates { get; set; }
         
