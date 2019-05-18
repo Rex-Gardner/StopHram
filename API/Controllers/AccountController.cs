@@ -30,7 +30,7 @@ namespace API.Controllers
         [HttpPost]
         [AllowAnonymous]
         // [ValidateAntiForgeryToken]
-        [Route("Login")]
+        [Route("api/v1/login")]
         public async Task<IActionResult> Login([FromBody]UserLogin clientUserLogin, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -60,7 +60,7 @@ namespace API.Controllers
         [HttpPost]
         [Authorize]
         //[ValidateAntiForgeryToken]
-        [Route("Logoff")]
+        [Route("api/v1/logoff")]
         public async Task<IActionResult> LogOff()
         {
             await signInManager.SignOutAsync();

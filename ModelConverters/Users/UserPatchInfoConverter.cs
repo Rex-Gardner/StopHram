@@ -8,9 +8,21 @@ namespace ModelConverters.Users
 {
     public static class UserPatchInfoConverter
     {
-        public static Model.UserPatchInfo Convert(Client.UserPatchInfo clientPatchInfo)
+        public static Model.UserPatchInfo Convert(string userName, Client.UserPatchInfo clientPatchInfo)
         {
-            throw new NotImplementedException();
+            if (userName == null)
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
+            if (clientPatchInfo == null)
+            {
+                throw new ArgumentNullException(nameof(clientPatchInfo));
+            }
+
+            var modelPatchInfo = new Model.UserPatchInfo(userName, clientPatchInfo.OldPassword,
+                clientPatchInfo.Password, clientPatchInfo.CreatedTroubles, clientPatchInfo.LikedTroubles);
+            return modelPatchInfo;
         }
     }
 }

@@ -14,7 +14,7 @@ using Model = Models.Users;
 
 namespace API.Controllers
 {
-    [Route("users")]
+    [Route("api/v1/users")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<User> userManager;
@@ -70,7 +70,7 @@ namespace API.Controllers
 
             await userManager.AddToRoleAsync(modelUser, "user");
             var clientUser = ModelConverters.Users.UserConverter.Convert(modelUser);
-            return CreatedAtRoute("GetUserRoute", new { userName = clientUser.UserName}, clientUser);
+            return CreatedAtRoute("GetUserRoute", new { userName = clientUser.UserName }, clientUser);
         }
 
         [HttpGet]
@@ -122,23 +122,69 @@ namespace API.Controllers
             var clientUser = ModelConverters.Users.UserConverter.Convert(user);
             return Ok(clientUser);
         }
-        /*
+
         [HttpPatch]
-        [Route("")]
-        public async Task<IActionResult> PatchUserAsync([FromBody] string id, [FromBody] Client.UserPatchInfo clientPatchInfo,
+        [Route("{userName}")]
+        public async Task<IActionResult> PatchUserAsync([FromRoute] string userName, [FromBody] Client.UserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (clientPatchInfo == null)
+            if (userName == null)
             {
-                var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
-                return BadRequest(error);
+                throw new NotImplementedException();
             }
 
-            var modelPatchInfo = ModelConverters.Users.UserPatchInfo.Convert(clientPatchInfo);
+            if (clientPatchInfo == null)
+            {
+                throw new NotImplementedException();
+                // var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
+                //return BadRequest(error);
+            }
+
+            var modelPatchInfo = ModelConverters.Users.UserPatchInfoConverter.Convert(userName, clientPatchInfo);
+
+            var user = await userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                throw new NotImplementedException();
+            }
+
+            var updated = false;
+
+            if (modelPatchInfo.Password != null && modelPatchInfo.OldPassword != null)
+            {
+                var passwordValidator = HttpContext.RequestServices.GetService(typeof(IPasswordValidator<User>)) as IPasswordValidator<User>;
+                var passwordHasher = HttpContext.RequestServices.GetService(typeof(IPasswordHasher<User>)) as IPasswordHasher<User>;
+                IdentityResult result = await passwordValidator.ValidateAsync(userManager, user, modelPatchInfo.Password);
+
+                if (result.Succeeded)
+                {
+                    user.PasswordHash = passwordHasher.HashPassword(user, modelPatchInfo.Password);
+                    updated = true;
+                }
+            }
+
+            if (modelPatchInfo.CreatedTroubles != null)
+            {
+                user.CreatedTroubles = modelPatchInfo.CreatedTroubles;
+                updated = true;
+            }
+
+            if (modelPatchInfo.LikedTroubles != null)
+            {
+                user.LikedTroubles = modelPatchInfo.LikedTroubles;
+                updated = true;
+            }
+
+            if (updated)
+            {
+                await userManager.UpdateAsync(user);
+            }
+
+            return Ok();
         }
-        */
+
         [HttpDelete]
         //[Authorize]
         [Route("{userName}")]

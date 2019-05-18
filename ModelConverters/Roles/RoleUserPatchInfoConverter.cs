@@ -8,14 +8,19 @@ namespace ModelConverters.Roles
 {
     public static class RoleUserPatchInfoConverter
     {
-        public static Model.RoleUserPatchInfo Converter(Client.RoleUserPatchInfo clientRoleUserPatchInfo)
+        public static Model.RoleUserPatchInfo Converter(string userName, Client.RoleUserPatchInfo clientRoleUserPatchInfo)
         {
+            if (userName == null)
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+
             if (clientRoleUserPatchInfo == null)
             {
                 throw new ArgumentNullException(nameof(clientRoleUserPatchInfo));
             }
 
-            var modelRoleUserPatchInfo = new Model.RoleUserPatchInfo(clientRoleUserPatchInfo.UserName, clientRoleUserPatchInfo.UserRoles);
+            var modelRoleUserPatchInfo = new Model.RoleUserPatchInfo(userName, clientRoleUserPatchInfo.UserRoles);
 
             return modelRoleUserPatchInfo;
         }

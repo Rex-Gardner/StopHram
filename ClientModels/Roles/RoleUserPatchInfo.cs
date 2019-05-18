@@ -9,9 +9,6 @@ namespace ClientModels.Roles
     public class RoleUserPatchInfo
     {
         [DataMember(IsRequired = true)]
-        public string UserName { get; set; }
-
-        [DataMember(IsRequired = true)]
         public IReadOnlyList<string> UserRoles { get; set; }
     }
 }

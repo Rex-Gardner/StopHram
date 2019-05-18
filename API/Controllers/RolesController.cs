@@ -14,7 +14,7 @@ using System.Collections.Immutable;
 
 namespace API.Controllers
 {
-    [Route("roles")]
+    [Route("api/v1/roles")]
     public class RolesController : ControllerBase
     {
         private RoleManager<Role> roleManager;
@@ -26,9 +26,9 @@ namespace API.Controllers
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
-        [HttpPost]
-        [Route("")]
-        public async Task<IActionResult> PatchRoleAsync([FromBody] Client.RoleUserPatchInfo clientPatchInfo,
+        [HttpPatch]
+        [Route("{userName}")]
+        public async Task<IActionResult> PatchRoleAsync([FromRoute]string userName, [FromBody] Client.RoleUserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -43,7 +43,7 @@ namespace API.Controllers
             Model.RoleUserPatchInfo modelPatchInfo;
             try
             {
-                modelPatchInfo = ModelConverters.Roles.RoleUserPatchInfoConverter.Converter(clientPatchInfo);
+                modelPatchInfo = ModelConverters.Roles.RoleUserPatchInfoConverter.Converter(userName, clientPatchInfo);
             }
             catch (ArgumentNullException ex)
             {
@@ -52,7 +52,7 @@ namespace API.Controllers
                 //return BadRequest(error);
             }
 
-            var user = await userManager.FindByNameAsync(clientPatchInfo.UserName);
+            var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
                 throw new NotImplementedException();
