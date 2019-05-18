@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.Troubles.Repositories;
 
 namespace API.Controllers
 {
@@ -18,6 +19,7 @@ namespace API.Controllers
     public class PicturesController : Controller
     {
         private IHostingEnvironment _hostingEnvironment;
+        private ITroubleRepository _troubleRepository;
 
         private void CreateDirectoryIfNotExists(string path)
         {
@@ -31,9 +33,10 @@ namespace API.Controllers
         /// Initializes a new instance of the <see cref="T:API.Controllers.PicturesController"/> class.
         /// </summary>
         /// <param name="hostingEnvironment">Hosting environment.</param>
-        public PicturesController(IHostingEnvironment hostingEnvironment)
+        public PicturesController(IHostingEnvironment hostingEnvironment, ITroubleRepository troubleRepository)
         {
             _hostingEnvironment = hostingEnvironment;
+            _troubleRepository = troubleRepository;
         }
         /// <summary>
         /// Добавляет одно изображение на сервер.
@@ -59,6 +62,9 @@ namespace API.Controllers
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                var troublePatchInfo = new TroublePatchInfo(id, null, path);
+                await _troubleRepository.PatchAsync(troublePatchInfo, cancellationToken).ConfigureAwait(false);
+
                 return Ok(new Picture(path));
             }
             else
@@ -94,6 +100,9 @@ namespace API.Controllers
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
+                    var troublePatchInfo = new TroublePatchInfo(id, null, path);
+                    await _troubleRepository.PatchAsync(troublePatchInfo, cancellationToken).ConfigureAwait(false);
+
                     result.Add(new Picture(path));
                 }
                 else
