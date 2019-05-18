@@ -7,11 +7,11 @@ namespace ModelConverters.Troubles
 {
     public static class TroubleConverterUtils
     {
-        public static Model.TroubleStatus? ConvertStatus(string avgCheck)
+        public static Model.TroubleStatus? ConvertStatus(string status)
         {
             Model.TroubleStatus? modelStatus = null;
 
-            if (Enum.TryParse(avgCheck, true, out Model.TroubleStatus tmpStatus))
+            if (Enum.TryParse(status, true, out Model.TroubleStatus tmpStatus))
             {
                 modelStatus = tmpStatus;
             }
@@ -28,5 +28,7 @@ namespace ModelConverters.Troubles
 
             throw new InvalidDataException($"{id} is invalid Guid.");
         }
+        
+        
     }
 }

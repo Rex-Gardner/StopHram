@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Models.Troubles.Exceptions;
@@ -51,7 +52,37 @@ namespace Models.Troubles.Repositories
 
         public Task<IReadOnlyList<Trouble>> SearchAsync(TroubleSearchInfo searchInfo, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            if (searchInfo == null)
+            {
+                throw new ArgumentNullException(nameof(searchInfo));
+            }
+            
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            var search = troubles.Find(item => true).ToEnumerable();
+
+            if (searchInfo.Tags != null)
+            {
+                search = search.Where(item => item.Tags.Any(tag => searchInfo.Tags.Contains(tag)));
+            }
+
+            if (searchInfo.Statuses != null)
+            {
+                search = search.Where(item => searchInfo.Statuses.Contains(item.Status));
+            }
+
+            if (searchInfo.Offset != null)
+            {
+                search = search.Skip(searchInfo.Offset.Value);
+            }
+
+            if (searchInfo.Limit != null)
+            {
+                search = search.Take(searchInfo.Limit.Value);
+            }
+
+            var result = search.ToList();
+            return Task.FromResult<IReadOnlyList<Trouble>>(result);
         }
 
         public Task<Trouble> GetAsync(Guid id, CancellationToken cancellationToken)

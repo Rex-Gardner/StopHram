@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +58,30 @@ namespace API.Controllers
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
             return CreatedAtRoute("GetTroubleRoute", new { id = clientTrouble.Id }, clientTrouble);
         }
-        
+
+        /// <summary>
+        /// Выполняет выборку проблем
+        /// </summary>
+        /// <param name="searchInfo">Параметры запроса</param>
+        /// <param name="cancellationToken"></param>
+        [HttpGet]
+        [Route("")]
+        public async Task<IActionResult> SearchTroubleAsync([FromQuery] Client.TroubleSearchInfo searchInfo,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var modelSearchInfo =
+                Converter.TroubleSearchInfoConverter.Convert(searchInfo ?? new Client.TroubleSearchInfo());
+            var modelTroubleList =
+                await repository.SearchAsync(modelSearchInfo, cancellationToken).ConfigureAwait(false);
+            var clientTroubleList = modelTroubleList
+                .Select(Converter.TroubleConverter.Convert)
+                .ToImmutableList();
+
+            return Ok(clientTroubleList);
+        }
+
         /// <summary>
         /// Возвращает проблему по идентификатору
         /// </summary>
