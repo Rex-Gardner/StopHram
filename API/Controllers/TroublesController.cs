@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using API.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Models.Tags.Repositories;
 using Models.Troubles.Exceptions;
 using Models.Troubles.Repositories;
 using Model = Models.Troubles;
@@ -17,11 +18,14 @@ namespace API.Controllers
     [Route("api/v1/troubles")]
     public class TroublesController : ControllerBase
     {
-        private readonly ITroubleRepository repository;
+        private readonly ITroubleRepository troubleRepository;
+        private readonly ITagRepository tagRepository;
+        private const string Target = "Trouble";
 
-        public TroublesController(ITroubleRepository repository)
+        public TroublesController(ITroubleRepository troubleRepository, ITagRepository tagRepository)
         {
-            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.troubleRepository = troubleRepository ?? throw new ArgumentNullException(nameof(troubleRepository));
+            this.tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
         }
         
         /// <summary>
@@ -42,18 +46,27 @@ namespace API.Controllers
                 return BadRequest(error);
             }
 
-            var modelCreationInfo = Converter.TroubleCreationInfoConverter.Convert(creationInfo);
             Model.Trouble modelTrouble;
 
             try
             {
+                var modelTags = await tagRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                var modelCreationInfo = Converter.TroubleCreationInfoConverter.Convert(creationInfo, modelTags);
                 modelTrouble =
-                    await repository.CreateAsync(modelCreationInfo, cancellationToken).ConfigureAwait(false);
+                    await troubleRepository.CreateAsync(modelCreationInfo, cancellationToken).ConfigureAwait(false);
             }
-            catch (TroubleDuplicationException ex)
+            catch (Exception ex)
             {
-                var error = Responses.DuplicationError(ex.Message, "Trouble");
-                return BadRequest(error);
+                if (ex is TroubleDuplicationException)
+                {
+                    var error = Responses.DuplicationError(ex.Message, Target);
+                    return BadRequest(error);                    
+                }
+                else //if (ex is InvalidDataException)
+                {
+                    var error = Responses.InvalidData(ex.Message, Target);
+                    return BadRequest(error);
+                }
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
@@ -75,7 +88,7 @@ namespace API.Controllers
             var modelSearchInfo =
                 Converter.TroubleSearchInfoConverter.Convert(searchInfo ?? new Client.TroubleSearchInfo());
             var modelTroubleList =
-                await repository.SearchAsync(modelSearchInfo, cancellationToken).ConfigureAwait(false);
+                await troubleRepository.SearchAsync(modelSearchInfo, cancellationToken).ConfigureAwait(false);
             var clientTroubleList = modelTroubleList
                 .Select(Converter.TroubleConverter.Convert)
                 .ToImmutableList();
@@ -101,7 +114,7 @@ namespace API.Controllers
             }
             catch (InvalidDataException ex)
             {
-                var error = Responses.InvalidId(ex.Message, "Trouble");
+                var error = Responses.InvalidId(ex.Message, Target);
                 return BadRequest(error);
             }
             
@@ -109,11 +122,11 @@ namespace API.Controllers
 
             try
             {
-                modelTrouble = await repository.GetAsync(guid, cancellationToken).ConfigureAwait(false);
+                modelTrouble = await troubleRepository.GetAsync(guid, cancellationToken).ConfigureAwait(false);
             }
             catch (TroubleNotFoundException ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Trouble");
+                var error = Responses.NotFoundError(ex.Message, Target);
                 return BadRequest(error);
             }
 
@@ -129,7 +142,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPatch]
         [Route("{id}")]
-        public async Task<IActionResult> PatchPlaceAsync([FromRoute] string id,
+        public async Task<IActionResult> PatchTroubleAsync([FromRoute] string id,
             [FromBody] Client.TroublePatchInfo patchInfo, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -140,17 +153,26 @@ namespace API.Controllers
                 return BadRequest(error);
             }
 
-            var modelPatchInfo = Converter.TroublePatchInfoConverter.Convert(id, patchInfo);
             Model.Trouble modelTrouble;
 
             try
             {
-                modelTrouble = await repository.PatchAsync(modelPatchInfo, cancellationToken).ConfigureAwait(false);
+                var modelTags = await tagRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                var modelPatchInfo = Converter.TroublePatchInfoConverter.Convert(id, patchInfo, modelTags);
+                modelTrouble = await troubleRepository.PatchAsync(modelPatchInfo, cancellationToken).ConfigureAwait(false);
             }
-            catch (TroubleNotFoundException ex)
+            catch (Exception ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Trouble");
-                return BadRequest(error);
+                if (ex is TroubleNotFoundException)
+                {
+                    var error = Responses.NotFoundError(ex.Message, Target);
+                    return BadRequest(error);                    
+                }
+                else
+                {
+                    var error = Responses.InvalidData(ex.Message, Target);
+                    return BadRequest(error);
+                }
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
@@ -172,11 +194,11 @@ namespace API.Controllers
             
             try
             {
-                await repository.RemoveAsync(guid, cancellationToken).ConfigureAwait(false);
+                await troubleRepository.RemoveAsync(guid, cancellationToken).ConfigureAwait(false);
             }
             catch (TroubleNotFoundException ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Trouble");
+                var error = Responses.NotFoundError(ex.Message, Target);
                 return BadRequest(error);
             }
 

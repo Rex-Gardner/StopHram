@@ -61,6 +61,20 @@ namespace API.Helpers
                 }
             };
         }
+        
+        public static Response InvalidData(string message, string target)
+        {
+            return new Response
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                ResponseDetails = new ResponseDetails
+                {
+                    Code = ResponseCodes.BadRequest,
+                    Message = message,
+                    Target = target
+                }
+            };
+        }
 
         public static Response InvalidImageData(string target)
         {
