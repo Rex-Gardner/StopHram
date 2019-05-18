@@ -16,6 +16,11 @@ namespace API.Controllers
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userManager">Менеджер пользователей</param>
+        /// <param name="signInManager">Менеджер аутентифицированных пользователей</param>
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -29,7 +34,6 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPost]
         [AllowAnonymous]
-        // [ValidateAntiForgeryToken]
         [Route("api/v1/login")]
         public async Task<IActionResult> Login([FromBody]UserLogin clientUserLogin, CancellationToken cancellationToken)
         {
@@ -59,7 +63,6 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        //[ValidateAntiForgeryToken]
         [Route("api/v1/logoff")]
         public async Task<IActionResult> LogOff()
         {

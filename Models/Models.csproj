@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AspNetCore.Identity.Mongo" Version="5.1.0.15" />
       <PackageReference Include="MongoDB.Driver" Version="2.9.0-beta1" />
       <PackageReference Include="System.Device.Location.Portable" Version="1.0.0" />
     </ItemGroup>

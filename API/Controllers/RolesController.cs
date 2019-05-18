@@ -14,18 +14,33 @@ using System.Collections.Immutable;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Контроллер ролей
+    /// </summary>
     [Route("api/v1/roles")]
     public class RolesController : ControllerBase
     {
         private RoleManager<Role> roleManager;
         private UserManager<User> userManager;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roleManager">Менеджер ролей</param>
+        /// <param name="userManager">Менеджер пользователей</param>
         public RolesController(RoleManager<Role> roleManager, UserManager<User> userManager)
         {
             this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName">Логин пользователя</param>
+        /// <param name="clientPatchInfo">Модель изменения пользователя</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPatch]
         [Route("{userName}")]
         public async Task<IActionResult> PatchRoleAsync([FromRoute]string userName, [FromBody] Client.RoleUserPatchInfo clientPatchInfo,
@@ -35,21 +50,19 @@ namespace API.Controllers
 
             if (clientPatchInfo == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
-                //return BadRequest(error);
+                return BadRequest();
             }
 
-            Model.RoleUserPatchInfo modelPatchInfo;
+            RoleUserPatchInfo modelPatchInfo;
             try
             {
                 modelPatchInfo = ModelConverters.Roles.RoleUserPatchInfoConverter.Converter(userName, clientPatchInfo);
             }
             catch (ArgumentNullException ex)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.ValidationError(ex.Message);
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             var user = await userManager.FindByNameAsync(userName);
