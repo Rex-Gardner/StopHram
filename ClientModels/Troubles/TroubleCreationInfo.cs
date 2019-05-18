@@ -17,7 +17,7 @@ namespace ClientModels.Troubles
         [DataMember(IsRequired = true)]
         public string Address { get; set; }
         
-        [DataMember(IsRequired = false)]
+        [DataMember(IsRequired = true)]
         public IReadOnlyList<string> Tags { get; set; }
     }
 }

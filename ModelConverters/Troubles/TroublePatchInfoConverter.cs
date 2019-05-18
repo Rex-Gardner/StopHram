@@ -9,18 +9,38 @@ namespace ModelConverters.Troubles
 {
     public static class TroublePatchInfoConverter
     {
-        public static Model.TroublePatchInfo Convert(string id, Client.TroublePatchInfo clientPatchInfo)
+        private const int CoordinatesLength = 2;
+        
+        public static Model.TroublePatchInfo Convert(string id, Client.TroublePatchInfo clientPatchInfo,
+            IReadOnlyList<Models.Tags.Tag> modelTags)
         {
             if (clientPatchInfo == null)
             {
                 throw new ArgumentNullException(nameof(clientPatchInfo));
+            }
+            
+            if (modelTags == null)
+            {
+                throw new ArgumentNullException(nameof(modelTags));
+            }
+
+            string[] filteredTagIds = null;
+            
+            if (clientPatchInfo.Tags != null)
+            {
+                filteredTagIds = TroubleConverterUtils.FilterWrongTagIds(clientPatchInfo.Tags, modelTags).ToArray();
+
+                if (!filteredTagIds.Any())
+                {
+                    throw new InvalidDataException($"{nameof(filteredTagIds)} can't be empty.");
+                }
             }
 
             double? latitude = null, longitude = null;
             
             if (clientPatchInfo.Coordinates != null)
             {
-                if (clientPatchInfo.Coordinates.Count != 2)
+                if (clientPatchInfo.Coordinates.Count != CoordinatesLength)
                 {
                     throw new InvalidDataException(
                         $"{nameof(clientPatchInfo.Coordinates)} must contain 2 values (lat and long).");
@@ -41,7 +61,7 @@ namespace ModelConverters.Troubles
                 Latitude = latitude,
                 Longitude = longitude,
                 Address = clientPatchInfo.Address,
-                Tags = clientPatchInfo.Tags,
+                Tags = filteredTagIds,
                 Status = status
             };
 
