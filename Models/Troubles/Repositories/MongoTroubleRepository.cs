@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,7 +101,64 @@ namespace Models.Troubles.Repositories
 
         public Task<Trouble> PatchAsync(TroublePatchInfo patchInfo, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            if (patchInfo == null)
+            {
+                throw new ArgumentNullException(nameof(patchInfo));
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            var trouble = troubles.Find(item => item.Id == patchInfo.Id).FirstOrDefault();
+
+            if (trouble == null)
+            {
+                throw new TroubleNotFoundException(patchInfo.Id.ToString());
+            }
+
+            var updated = false;
+
+            if (patchInfo.Name != null)
+            {
+                trouble.Name = patchInfo.Name;
+                updated = true;
+            }
+            
+            if (patchInfo.Description != null)
+            {
+                trouble.Description = patchInfo.Description;
+                updated = true;
+            }
+            
+            if (patchInfo.Latitude != null && patchInfo.Longitude != null)
+            {
+                trouble.Coordinates = new GeoCoordinate(patchInfo.Latitude.Value, patchInfo.Longitude.Value);
+                updated = true;
+            }
+
+            if (patchInfo.Address != null)
+            {
+                trouble.Address = patchInfo.Address;
+                updated = true;
+            }
+
+            if (patchInfo.Tags != null && patchInfo.Tags.Any())
+            {
+                trouble.Tags = patchInfo.Tags;
+                updated = true;
+            }
+
+            if (patchInfo.Status != null)
+            {
+                trouble.Status = patchInfo.Status.Value;
+                updated = true;
+            }
+
+            if (updated)
+            {
+                trouble.LastUpdateAt = DateTime.UtcNow;
+                troubles.ReplaceOne(item => item.Id == patchInfo.Id, trouble);
+            }
+
+            return Task.FromResult(trouble);
         }
 
         public Task RemoveAsync(Guid id, CancellationToken cancellationToken)

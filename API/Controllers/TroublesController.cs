@@ -119,5 +119,41 @@ namespace API.Controllers
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
             return Ok(clientTrouble);
         }
+        
+        /// <summary>
+        /// Изменяет информацию о проблеме
+        /// </summary>
+        /// <param name="id">Идентификатор проблемы</param>
+        /// <param name="patchInfo">Новые значения параметров проблемы</param>
+        /// <param name="cancellationToken"></param>
+        [HttpPatch]
+        [Route("{id}")]
+        public async Task<IActionResult> PatchPlaceAsync([FromRoute] string id,
+            [FromBody] Client.TroublePatchInfo patchInfo, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (patchInfo == null)
+            {
+                //todo Implement ErrorResponseService
+                return BadRequest();
+            }
+
+            var modelPatchInfo = Converter.TroublePatchInfoConverter.Convert(id, patchInfo);
+            Model.Trouble modelTrouble;
+
+            try
+            {
+                modelTrouble = await repository.PatchAsync(modelPatchInfo, cancellationToken).ConfigureAwait(false);
+            }
+            catch (TroubleNotFoundException ex)
+            {
+                //todo Implement ErrorResponseService
+                return NotFound(ex.Message);
+            }
+
+            var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
+            return Ok(clientTrouble);
+        }
     }
 }
