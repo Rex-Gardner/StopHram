@@ -47,7 +47,7 @@ namespace API.Controllers
                 return error;
             }
 
-            response = Responses.Ok(path);
+            response = Responses.Ok(path, "Picture");
             return response;
         }
     }
