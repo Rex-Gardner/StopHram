@@ -129,7 +129,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPatch]
         [Route("{id}")]
-        public async Task<IActionResult> PatchPlaceAsync([FromRoute] string id,
+        public async Task<IActionResult> PatchTroubleAsync([FromRoute] string id,
             [FromBody] Client.TroublePatchInfo patchInfo, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
