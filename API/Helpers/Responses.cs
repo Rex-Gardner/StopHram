@@ -5,43 +5,43 @@ namespace API.Helpers
 {
     public static class Responses
     {
-        public static ErrorResponseService Ok(string target)
+        public static ResponseService Ok(string target)
         {
-            return new ErrorResponseService
+            return new ResponseService
             {
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Error = new ServiceError
+                Error = new ServiceResponse
                 {
                     Code = System.Net.HttpStatusCode.OK.ToString(),
-                    Message = "OK",
+                    Message = ResponseCodes.Ok,
                     Target = target
                 }
             };
         }
 
-        public static ErrorResponseService BodyIsMissing(string target)
+        public static ResponseService BodyIsMissing(string target)
         {
-            return new ErrorResponseService
+            return new ResponseService
             {
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Error = new ServiceError
+                Error = new ServiceResponse
                 {
                     Code = System.Net.HttpStatusCode.BadRequest.ToString(),
-                    Message = "Body is Missing",
+                    Message = ResponseCodes.BadRequest,
                     Target = target
                 }
             };
         }
 
-        public static ErrorResponseService InvalidImageData(string target)
+        public static ResponseService InvalidImageData(string target)
         {
-            return new ErrorResponseService
+            return new ResponseService
             {
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Error = new ServiceError
+                Error = new ServiceResponse
                 {
                     Code = System.Net.HttpStatusCode.BadRequest.ToString(),
-                    Message = "Invalid Image Data",
+                    Message = ResponseCodes.BadRequest,
                     Target = target
                 }
             };

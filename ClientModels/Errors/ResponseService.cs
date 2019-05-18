@@ -3,12 +3,12 @@ using System.Net;
 
 namespace ClientModels.Errors
 {
-    public class ErrorResponseService
+    public class ResponseService
     {
         public HttpStatusCode StatusCode { get; set; }
-        public ServiceError Error { get; set; }
+        public ServiceResponse Error { get; set; }
 
-        public ErrorResponseService()
+        public ResponseService()
         {
         }
     }

@@ -22,10 +22,10 @@ namespace API.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public async Task<ErrorResponseService> UploadPictureAsync(string id, IFormFile picture, CancellationToken cancellationToken)
+        public async Task<ResponseService> UploadPictureAsync(string id, IFormFile picture, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ErrorResponseService response;
+            ResponseService response;
 
             if (id == null)
             {
