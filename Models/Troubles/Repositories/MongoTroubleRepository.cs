@@ -152,6 +152,12 @@ namespace Models.Troubles.Repositories
                 updated = true;
             }
 
+            if (patchInfo.Images != null)
+            {
+                trouble.Images = patchInfo.Images;
+                updated = true;
+            }
+
             if (updated)
             {
                 trouble.LastUpdateAt = DateTime.UtcNow;
