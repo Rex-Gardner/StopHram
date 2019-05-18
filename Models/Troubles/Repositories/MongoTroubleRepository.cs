@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Models.Troubles.Exceptions;
 using MongoDB.Driver;
 
 namespace Models.Troubles.Repositories
@@ -39,7 +40,7 @@ namespace Models.Troubles.Repositories
                 Coordinates = creationInfo.Coordinates,
                 Address = creationInfo.Address,
                 Tags = creationInfo.Tags,
-                Status = creationInfo.Status,
+                Status = TroubleStatus.Created,
                 CreatedAt = now,
                 LastUpdateAt = now
             };
@@ -53,9 +54,17 @@ namespace Models.Troubles.Repositories
             throw new System.NotImplementedException();
         }
 
-        public Task<Trouble> GetAsync(string id, CancellationToken cancellationToken)
+        public Task<Trouble> GetAsync(Guid id, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            var trouble = troubles.Find(item => item.Id == id).FirstOrDefault();
+            
+            if (trouble == null)
+            {
+                throw new TroubleNotFoundException(id.ToString());
+            }
+
+            return Task.FromResult(trouble);
         }
 
         public Task<Trouble> PatchAsync(TroublePatchInfo patchInfo, CancellationToken cancellationToken)
@@ -63,7 +72,7 @@ namespace Models.Troubles.Repositories
             throw new System.NotImplementedException();
         }
 
-        public Task RemoveAsync(string id, CancellationToken cancellationToken)
+        public Task RemoveAsync(Guid id, CancellationToken cancellationToken)
         {
             throw new System.NotImplementedException();
         }

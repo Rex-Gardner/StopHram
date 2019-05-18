@@ -24,11 +24,9 @@ namespace ModelConverters.Troubles
                 throw new InvalidDataException(nameof(creationInfo.Coordinates));
             }
 
-            var status = TroubleConverterUtils.ConvertStatus(creationInfo.Status);
-            
             var modelCreationInfo = new Model.TroubleCreationInfo(creationInfo.Name, creationInfo.Description,
                 creationInfo.Images, coordinates[0], coordinates[1], creationInfo.Address,
-                creationInfo.Tags, status);
+                creationInfo.Tags);
 
             return modelCreationInfo;
         }

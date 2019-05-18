@@ -23,8 +23,5 @@ namespace ClientModels.Troubles
         
         [DataMember(IsRequired = false)]
         public IReadOnlyList<string> Tags { get; set; }
-        
-        [DataMember(IsRequired = true)]
-        public string Status { get; set; }
     }
 }

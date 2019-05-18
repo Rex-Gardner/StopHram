@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Model = Models.Troubles;
 using Client = ClientModels.Troubles;
 
@@ -16,6 +17,16 @@ namespace ModelConverters.Troubles
             }
 
             return modelStatus;
+        }
+
+        public static Guid ConvertId(string id)
+        {
+            if (Guid.TryParse(id, out var guid))
+            {
+                return guid;
+            }
+
+            throw new InvalidDataException($"{id} is invalid Guid.");
         }
     }
 }

@@ -14,10 +14,9 @@ namespace Models.Troubles
         public GeoCoordinate Coordinates { get; set; }
         public string Address { get; set; }
         public IReadOnlyList<string> Tags { get; set; }
-        public TroubleStatus Status { get; set; }
 
         public TroubleCreationInfo(string name, string description, IEnumerable<string> images, 
-            double latitude, double longitude, string address, IEnumerable<string> tags, TroubleStatus? status)
+            double latitude, double longitude, string address, IEnumerable<string> tags)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
@@ -25,7 +24,6 @@ namespace Models.Troubles
             Coordinates = new GeoCoordinate(latitude, longitude);
             Address = address ?? throw new ArgumentNullException(nameof(address));
             Tags = tags?.ToArray() ?? new string[0];
-            Status = status ?? throw new ArgumentNullException(nameof(status));
         }
     }
 }
