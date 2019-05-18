@@ -17,7 +17,7 @@ namespace Models.Users
         {
             UserName = userName;
             OldPassword = oldPassword;
-            Password = Password;
+            Password = password;
             CreatedTroubles = createdTroubles;
             LikedTroubles = likedTroubles;
         }

@@ -113,7 +113,6 @@ namespace API.Controllers
             }
 
             /*var name = HttpContext.User.Identity.Name;
-
             if (user.UserName.CompareTo(name) != 0)
             {
                 return Forbid();
