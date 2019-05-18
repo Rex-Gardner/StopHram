@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -12,9 +11,6 @@ namespace ClientModels.Troubles
         [DataMember(IsRequired = true)]
         public string Description { get; set; }
         
-        [DataMember(IsRequired = false)]
-        public IReadOnlyList<string> Images { get; set; }
-        
         [DataMember(IsRequired = true)]
         public IReadOnlyList<double> Coordinates { get; set; }
         
@@ -23,8 +19,5 @@ namespace ClientModels.Troubles
         
         [DataMember(IsRequired = false)]
         public IReadOnlyList<string> Tags { get; set; }
-        
-        [DataMember(IsRequired = true)]
-        public string Status { get; set; }
     }
 }

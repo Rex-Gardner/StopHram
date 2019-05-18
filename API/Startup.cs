@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Models.Tags.Repositories;
+using Models.Troubles.Repositories;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace API
@@ -18,6 +19,7 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ITagRepository, MongoTagRepository>();
+            services.AddSingleton<ITroubleRepository, MongoTroubleRepository>();
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyPolicy"));
