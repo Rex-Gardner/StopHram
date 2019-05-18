@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.Troubles;
 using Models.Troubles.Repositories;
+using ModelConverters.Troubles;
+using System.Linq;
 
 namespace API.Controllers
 {
@@ -58,11 +61,15 @@ namespace API.Controllers
             var id = 0;
             CreateDirectoryIfNotExists($"{_hostingEnvironment.WebRootPath}/pictures/{troubleId}");
             var path = $"{_hostingEnvironment.WebRootPath}/pictures/{troubleId}/{id}{extension}";
+            var paths = new string[1] { path };
+
             var response = await UploadHelper.UploadPictureAsync(troubleId, path, picture, cancellationToken);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                var troublePatchInfo = new TroublePatchInfo(id, null, path);
+                var troublePatchInfo = new TroublePatchInfo(TroubleConverterUtils.ConvertId(troubleId), null, null, paths,
+                    null, null, null, null, null);
+
                 await _troubleRepository.PatchAsync(troublePatchInfo, cancellationToken).ConfigureAwait(false);
 
                 return Ok(new Picture(path));
@@ -73,8 +80,8 @@ namespace API.Controllers
             }
         }
 
-        /// <summary>
         /// Добавляет несколько изображений на сервер.
+        /// <summary>
         /// </summary>
         /// <returns>Лист с объектами типа Picture.</returns>
         /// <param name="pictures">Коллекция файлов</param>
@@ -100,9 +107,6 @@ namespace API.Controllers
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var troublePatchInfo = new TroublePatchInfo(id, null, path);
-                    await _troubleRepository.PatchAsync(troublePatchInfo, cancellationToken).ConfigureAwait(false);
-
                     result.Add(new Picture(path));
                 }
                 else
@@ -112,6 +116,11 @@ namespace API.Controllers
 
                 id++;
             }
+
+            var paths = result.Select(x => x.Url);
+            var troublePatchInfo = new TroublePatchInfo(TroubleConverterUtils.ConvertId(troubleId), null, null, paths.ToArray(), 
+                null, null, null, null, null);
+            await _troubleRepository.PatchAsync(troublePatchInfo, cancellationToken).ConfigureAwait(false);
 
             return Ok(result);
         }
