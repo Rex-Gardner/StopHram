@@ -8,8 +8,6 @@ namespace Models.Troubles
 {
     public class Trouble
     {
-        //todo subscribedUsers
-        //todo author
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
@@ -38,6 +36,14 @@ namespace Models.Troubles
         [BsonElement("Status")]
         [BsonRepresentation(BsonType.String)]
         public TroubleStatus Status { get; set; }
+        
+        [BsonElement("Author")]
+        [BsonRepresentation(BsonType.String)]
+        public string Author { get; set; }
+        
+        [BsonElement("LikedUsers")]
+        [BsonRepresentation(BsonType.String)]
+        public IReadOnlyList<string> LikedUsers { get; set; }
         
         [BsonElement("CreatedAt")]
         [BsonRepresentation(BsonType.DateTime)]

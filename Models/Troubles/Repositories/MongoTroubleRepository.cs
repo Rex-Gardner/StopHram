@@ -20,11 +20,16 @@ namespace Models.Troubles.Repositories
             troubles = database.GetCollection<Trouble>("Troubles");
         }
         
-        public Task<Trouble> CreateAsync(TroubleCreationInfo creationInfo, CancellationToken cancellationToken)
+        public Task<Trouble> CreateAsync(TroubleCreationInfo creationInfo, string author, CancellationToken cancellationToken)
         {
             if (creationInfo == null)
             {
                 throw new ArgumentNullException(nameof(creationInfo));
+            }
+
+            if (author == null)
+            {
+                throw new ArgumentNullException(nameof(author));
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -43,6 +48,8 @@ namespace Models.Troubles.Repositories
                 Address = creationInfo.Address,
                 Tags = creationInfo.Tags,
                 Status = TroubleStatus.Created,
+                Author = author,
+                LikedUsers = new string[0],
                 CreatedAt = now,
                 LastUpdateAt = now
             };
