@@ -2,6 +2,8 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Helpers;
@@ -9,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Tags.Repositories;
 using Models.Troubles.Exceptions;
 using Models.Troubles.Repositories;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Model = Models.Troubles;
 using Client = ClientModels.Troubles;
 using Converter = ModelConverters.Troubles;
@@ -21,6 +25,7 @@ namespace API.Controllers
         private readonly ITroubleRepository troubleRepository;
         private readonly ITagRepository tagRepository;
         private const string Target = "Trouble";
+        private const int RuquiredLikesCount = 100;
 
         public TroublesController(ITroubleRepository troubleRepository, ITagRepository tagRepository)
         {
@@ -225,11 +230,11 @@ namespace API.Controllers
         {
             cancellationToken.ThrowIfCancellationRequested();
             var guid = Converter.TroubleConverterUtils.ConvertId(id);
-            var author = HttpContext.User.Identity.Name;
+            var userName = HttpContext.User.Identity.Name;
 
-            if (author == null)
+            if (userName == null)
             {
-                var error = Responses.Unauthorized(nameof(author));
+                var error = Responses.Unauthorized(nameof(userName));
                 return Unauthorized(error);
             }
             
@@ -237,13 +242,32 @@ namespace API.Controllers
 
             try
             {
-                modelTrouble = await troubleRepository.ToggleLikeAsync(guid, author, cancellationToken)
+                modelTrouble = await troubleRepository.ToggleLikeAsync(guid, userName, cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (TroubleNotFoundException ex)
             {
                 var error = Responses.NotFoundError(ex.Message, Target);
                 return BadRequest(error);
+            }
+
+            if (modelTrouble.Status == Model.TroubleStatus.Created && modelTrouble.LikedUsers.Count >= RuquiredLikesCount)
+            {
+                var httpClient = new HttpClient();
+                //todo uri для разных гор советов
+                //todo разные представители округов по координатам проблемы
+
+                var request = new ClientModels.GorSovetRequests.GorSovetRequest(userName, modelTrouble.Description);
+                var jsonString = JsonConvert.SerializeObject(request);
+                
+                var response = await httpClient.PostAsync("http://gorsovetnsk.ru/feedback/new/", 
+                    new StringContent(jsonString, Encoding.UTF8,"application/json"), cancellationToken);
+                
+                response.EnsureSuccessStatusCode();
+                //todo отображать информацию об отправленном заявлении
+
+                modelTrouble = await troubleRepository.PatchAsync(new Model.TroublePatchInfo(guid, null, null, null,
+                    null, null, null, null, Model.TroubleStatus.Proved), cancellationToken);
             }
 
             var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
