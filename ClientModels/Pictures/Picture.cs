@@ -1,5 +1,5 @@
 ﻿using System;
-namespace ClientModels
+namespace ClientModels.Pictures
 {
     public class Picture
     {
