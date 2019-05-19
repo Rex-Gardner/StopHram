@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
 using System.Collections.Immutable;
+using API.Helpers;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
@@ -52,7 +53,7 @@ namespace API.Controllers
 
             if (clientPatchInfo == null)
             {
-                //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
+                var error = Responses.BodyIsMissing(nameof(clientPatchInfo));
                 return BadRequest();
             }
 
@@ -63,14 +64,14 @@ namespace API.Controllers
             }
             catch (ArgumentNullException ex)
             {
-                //var error = ServiceErrorResponses.ValidationError(ex.Message);
-                return BadRequest();
+                var error = Responses.BodyIsMissing(ex.Message);
+                return BadRequest(error);
             }
 
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                //var error = ServiceErrorResponses.UserNotFound(clientPatchInfo.UserId);
+                var error = Responses.NotFoundError("User not found", userName);
                 return BadRequest();
             }
 
@@ -87,8 +88,8 @@ namespace API.Controllers
 
             if (modelUserRoles.Count == 0)
             {
-                //var error = ServiceErrorResponses.RoleNotFound(clientPatchInfo.UserRoles.ToString());
-                return BadRequest();
+                var error = Responses.NotFoundError(nameof(clientPatchInfo.UserRoles), "UserRoles");
+                return BadRequest(error);
             }
 
             user.Roles = modelUserRoles;
@@ -115,9 +116,9 @@ namespace API.Controllers
             {
                 clientRoles = roles.Select(item => ModelConverters.Roles.RoleConverter.Convert(item)).ToImmutableList();
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                //var error = ServiceErrorResponses.RoleNotFound("roles");
+                var error = Responses.NotFoundError(ex.Message, "roles");
                 return NotFound();
             }
 
@@ -142,9 +143,9 @@ namespace API.Controllers
             {
                 var clientRoles = ModelConverters.Roles.RoleConverter.Convert(role);
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                //var error = ServiceErrorResponses.RoleNotFound("role");
+                var error = Responses.NotFoundError(ex.Message, "role");
                 return NotFound();
             }
 

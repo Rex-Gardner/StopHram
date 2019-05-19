@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using API.Helpers;
 using Client = ClientModels.Users;
 using Model = Models.Users;
 
@@ -40,11 +41,11 @@ namespace API.Controllers
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var err = HttpContext;
+
             if (clientCreationInfo == null)
             {
-                //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientUserInfo));
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(clientCreationInfo));
+                return BadRequest(error);
             }
 
             var modelCreationInfo = ModelConverters.Users.UserCreationInfoConverter.Convert(clientCreationInfo);
@@ -52,11 +53,10 @@ namespace API.Controllers
             var user = await userManager.FindByNameAsync(modelCreationInfo.UserName);
             if (user != null)
             {
-                //var error = ServiceErrorResponses.UserNameAlreadyUse(clientUserInfo.UserName);
+                var error = Responses.DuplicationError($"User with username {modelCreationInfo.UserName} already use", "User");
                 return BadRequest();
             }
 
-            //
             var dateTime = DateTime.UtcNow;
 
             var modelUser = new User
@@ -70,8 +70,8 @@ namespace API.Controllers
             var result = await userManager.CreateAsync(modelUser, modelCreationInfo.Password);
             if (!result.Succeeded)
             {
-                //var error = ServiceErrorResponses.ValidationError(result.Errors.First().ToString());
-                return BadRequest();
+                var error = Responses.InvalidData(result.Errors.First().ToString(), "NotValid");
+                return BadRequest(error);
             }
 
             await userManager.AddToRoleAsync(modelUser, "user");
@@ -99,8 +99,8 @@ namespace API.Controllers
             }
             catch (ArgumentNullException)
             {
-                //var error = ServiceErrorResponses.UserNotFound("users");
-                return NotFound();
+                var error = Responses.NotFoundError("Users not found", "userManager");
+                return NotFound(error);
             }
 
             return Ok(clientUsers);
@@ -114,11 +114,10 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{userName}", Name = "GetUserRoute")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetUser([FromRoute]string userName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             var isAuthorize = HttpContext.User.IsInRole("admin") ||
                               HttpContext.User.Identity.Name.CompareTo(userName.ToLower()) == 0;
 
@@ -131,9 +130,8 @@ namespace API.Controllers
 
             if (user == null)
             {
-                throw new NotImplementedException();
-                //var error = ServiceErrorResponses.UserNotFound(id);
-                //return BadRequest(error);
+                var error = Responses.NotFoundError($"User with {userName} not found", "User");
+                return BadRequest(error);
             }
 
             var clientUser = ModelConverters.Users.UserConverter.Convert(user);
@@ -149,21 +147,16 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("{userName}")]
-
+        [Authorize]
         public async Task<IActionResult> PatchUserAsync([FromRoute] string userName, [FromBody] Client.UserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (userName == null)
-            {
-                throw new NotImplementedException();
-            }
-
             if (clientPatchInfo == null)
             {
-                // var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(clientPatchInfo));
+                return BadRequest(error);
             }
 
             var isAuthorize = HttpContext.User.IsInRole("admin") ||
@@ -217,11 +210,6 @@ namespace API.Controllers
         public async Task<ActionResult> Delete([FromRoute]string userName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (userName == null)
-            {
-                //var error = ServiceErrorResponses.ValidationError("UserId");
-                return BadRequest();
-            }
 
             var isAuthorize = HttpContext.User.IsInRole("admin") ||
                               HttpContext.User.Identity.Name.CompareTo(userName.ToLower()) == 0;
@@ -234,11 +222,10 @@ namespace API.Controllers
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                //var error = ServiceErrorResponses.UserNotFound(id);
+                var error = Responses.NotFoundError($"User with username {userName} not found", "User");
                 return NotFound();
             }
 
-            // todo Удалить CreatedTroubles
             var result = await userManager.DeleteAsync(user);
             return NoContent();
         }
