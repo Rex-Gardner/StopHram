@@ -9,17 +9,12 @@ namespace Models.Users
         public string UserName { get; }
         public string OldPassword { get; set; }
         public string Password { get; set; }
-        public IReadOnlyList<Guid> CreatedTroubles { get; set; }
-        public IReadOnlyList<Guid> LikedTroubles { get; set; }
 
-        public UserPatchInfo(string userName, string oldPassword = null, string password = null,
-            IReadOnlyList<Guid> createdTroubles = null, IReadOnlyList<Guid> likedTroubles = null)
+        public UserPatchInfo(string userName, string oldPassword = null, string password = null)
         {
             UserName = userName;
             OldPassword = oldPassword;
             Password = password;
-            CreatedTroubles = createdTroubles;
-            LikedTroubles = likedTroubles;
         }
     }
 }
