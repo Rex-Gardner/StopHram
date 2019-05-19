@@ -14,6 +14,9 @@ using Model = Models.Users;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Контроллер пользователей
+    /// </summary>
     [Route("api/v1/users")]
     public class UsersController : ControllerBase
     {
@@ -116,6 +119,14 @@ namespace API.Controllers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var isAuthorize = HttpContext.User.IsInRole("admin") ||
+                              HttpContext.User.Identity.Name.CompareTo(userName.ToLower()) == 0;
+
+            if (!isAuthorize)
+            {
+                return Forbid();
+            }
+
             var user = await userManager.FindByNameAsync(userName);
 
             if (user == null)
@@ -144,7 +155,7 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("{userName}")]
-        
+
         public async Task<IActionResult> PatchUserAsync([FromRoute] string userName, [FromBody] Client.UserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
@@ -162,12 +173,19 @@ namespace API.Controllers
                 return BadRequest();
             }
 
+            var isAuthorize = HttpContext.User.IsInRole("admin") ||
+                              HttpContext.User.Identity.Name.CompareTo(userName.ToLower()) == 0;
+
+            if (!isAuthorize)
+            {
+                return Forbid();
+            }
+
             var modelPatchInfo = ModelConverters.Users.UserPatchInfoConverter.Convert(userName, clientPatchInfo);
 
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                //throw new NotImplementedException();
                 return BadRequest();
             }
 
@@ -224,7 +242,13 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            //if(HttpContext.User.IsInRole("admin") || HttpContext.User.Identity.Name)
+            var isAuthorize = HttpContext.User.IsInRole("admin") ||
+                              HttpContext.User.Identity.Name.CompareTo(userName.ToLower()) == 0;
+
+            if (!isAuthorize)
+            {
+                return Forbid();
+            }
 
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
