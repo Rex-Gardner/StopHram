@@ -130,7 +130,7 @@ namespace API.Helpers
 
         public static async Task<Response> UploadPictureAsync(IHostingEnvironment hostingEnvironment, 
                                                               string path, 
-                                                              IFormFile picture, 
+                                                              IFormFile picture,
                                                               CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -142,7 +142,7 @@ namespace API.Helpers
                 return response;
             }
 
-            const int maxFileLength = 1024 * 512;
+            const int maxFileLength = 1024 * 5120;
             var stream = picture.OpenReadStream();
 
             if (picture.Length > 0 && picture.Length <= maxFileLength && ImageValidation.IsImage(stream))
