@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using API.Helpers;
 
 namespace API.Controllers
 {
@@ -44,19 +45,20 @@ namespace API.Controllers
 
             if (clientUserLogin == null)
             {
-                //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientUserLogin));
-                return BadRequest();
+                var error = Responses.BodyIsMissing(nameof(clientUserLogin));
+                return BadRequest(error);
             }
 
             var modelUserLogin = ModelConverters.UserIdentity.UserLoginConverter.Convert(clientUserLogin);
 
             var result = await signInManager.PasswordSignInAsync(modelUserLogin.UserName, modelUserLogin.Password, modelUserLogin.RememberMe, false);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                return Ok(result);
+                var error = Responses.InvalidData(nameof(modelUserLogin), "UserLogin");
+                return BadRequest(result);
             }
 
-            return BadRequest(result);
+                return Ok(result);
         }
 
         /// <summary>
@@ -69,7 +71,6 @@ namespace API.Controllers
         public async Task<IActionResult> LogOff()
         {
             await signInManager.SignOutAsync();
-            var usere = HttpContext.User;
             return Ok();
         }
     }
