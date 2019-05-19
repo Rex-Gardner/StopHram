@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Tags.Exceptions;
 using Models.Tags.Repositories;
@@ -30,6 +31,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPost]
         [Route("")]
+        [Authorize(Roles="admin")]
         public async Task<IActionResult> CreateTagAsync([FromBody]Client.TagCreationInfo creationInfo,
             CancellationToken cancellationToken)
         {
@@ -65,6 +67,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTagsAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -82,6 +85,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpGet]
         [Route("{id}", Name = "GetTagRoute")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTagAsync([FromRoute]string id, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -109,6 +113,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPatch]
         [Route("{id}")]
+        [Authorize(Roles="admin")]
         public async Task<IActionResult> PatchTagAsync([FromRoute] string id,
             [FromBody] Client.TagPatchInfo patchInfo, CancellationToken cancellationToken)
         {
@@ -144,6 +149,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles="admin")]
         public async Task<IActionResult> DeleteTagAsync([FromRoute]string id, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

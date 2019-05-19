@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Tags.Repositories;
 using Models.Troubles.Exceptions;
@@ -35,6 +36,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPost]
         [Route("")]
+        [Authorize]
         public async Task<IActionResult> CreateTroubleAsync([FromBody]Client.TroubleCreationInfo creationInfo,
             CancellationToken cancellationToken)
         {
@@ -88,6 +90,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpGet]
         [Route("")]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchTroubleAsync([FromQuery] Client.TroubleSearchInfo searchInfo,
             CancellationToken cancellationToken)
         {
@@ -111,6 +114,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpGet]
         [Route("{id}", Name = "GetTroubleRoute")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTroubleAsync([FromRoute]string id, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -150,6 +154,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPatch]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> PatchTroubleAsync([FromRoute] string id,
             [FromBody] Client.TroublePatchInfo patchInfo, CancellationToken cancellationToken)
         {
@@ -160,6 +165,31 @@ namespace API.Controllers
                 var error = Responses.BodyIsMissing(nameof(patchInfo));
                 return BadRequest(error);
             }
+
+            var guid = Converter.TroubleConverterUtils.ConvertId(id);
+
+            Model.Trouble trouble;
+            try
+            {
+                trouble = await troubleRepository.GetAsync(guid, cancellationToken).ConfigureAwait(false);
+            }
+            catch (TroubleNotFoundException ex)
+            {
+                var error = Responses.NotFoundError(ex.Message, Target);
+                return BadRequest(error);
+            }
+
+            var isAuthorized = trouble.Author == HttpContext.User.Identity.Name || HttpContext.User.IsInRole("admin");
+            if (!isAuthorized)
+            {
+                return Forbid();
+            }
+
+            if (!HttpContext.User.IsInRole("admin"))
+            {
+                patchInfo.Status = null;
+            }
+
 
             Model.Trouble modelTrouble;
 
@@ -194,21 +224,31 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpDelete]
         [Route("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteTagAsync([FromRoute]string id, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var guid = Converter.TroubleConverterUtils.ConvertId(id);
-            
+
+            Model.Trouble trouble;
             try
             {
-                await troubleRepository.RemoveAsync(guid, cancellationToken).ConfigureAwait(false);
+                trouble = await troubleRepository.GetAsync(guid, cancellationToken).ConfigureAwait(false);
             }
             catch (TroubleNotFoundException ex)
             {
                 var error = Responses.NotFoundError(ex.Message, Target);
                 return BadRequest(error);
             }
+
+            var isAuthorized = trouble.Author == HttpContext.User.Identity.Name || HttpContext.User.IsInRole("admin");
+            if (!isAuthorized)
+            {
+                return Forbid();
+            }
+            
+            await troubleRepository.RemoveAsync(guid, cancellationToken).ConfigureAwait(false);
 
             return NoContent();
         }
