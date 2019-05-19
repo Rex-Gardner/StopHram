@@ -186,5 +186,37 @@ namespace Models.Troubles.Repositories
 
             return Task.CompletedTask;
         }
+
+        public Task<Trouble> ToggleLikeAsync(Guid id, string userName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (userName == null)
+            {
+                throw new ArgumentNullException(nameof(userName));
+            }
+            
+            var trouble = troubles.Find(item => item.Id == id).FirstOrDefault();
+
+            if (trouble == null)
+            {
+                throw new TroubleNotFoundException(id.ToString());
+            }
+
+            var likedUsers = new List<string>(trouble.LikedUsers);
+            
+            if (likedUsers.Contains(userName))
+            {
+                likedUsers.Remove(userName);
+            }
+            else
+            {
+                likedUsers.Add(userName);
+            }
+
+            trouble.LikedUsers = likedUsers.ToArray();
+            troubles.ReplaceOne(item => item.Id == id, trouble);
+            return Task.FromResult(trouble);
+        }
     }
 }
