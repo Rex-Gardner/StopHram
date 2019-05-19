@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Client = ClientModels.Users;
 using Model = Models.Users;
@@ -21,7 +22,7 @@ namespace ModelConverters.Users
             }
 
             var modelPatchInfo = new Model.UserPatchInfo(userName, clientPatchInfo.OldPassword,
-                clientPatchInfo.Password, clientPatchInfo.CreatedTroubles, clientPatchInfo.LikedTroubles);
+                clientPatchInfo.Password);
             return modelPatchInfo;
         }
     }

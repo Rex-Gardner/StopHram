@@ -136,12 +136,6 @@ namespace API.Controllers
                 //return BadRequest(error);
             }
 
-            /*var name = HttpContext.User.Identity.Name;
-            if (user.UserName.CompareTo(name) != 0)
-            {
-                return Forbid();
-            }*/
-
             var clientUser = ModelConverters.Users.UserConverter.Convert(user);
             return Ok(clientUser);
         }
@@ -168,7 +162,6 @@ namespace API.Controllers
 
             if (clientPatchInfo == null)
             {
-                //throw new NotImplementedException();
                 // var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
                 return BadRequest();
             }
@@ -202,18 +195,6 @@ namespace API.Controllers
                     user.PasswordHash = passwordHasher.HashPassword(user, modelPatchInfo.Password);
                     updated = true;
                 }
-            }
-
-            if (modelPatchInfo.CreatedTroubles != null)
-            {
-                user.CreatedTroubles = modelPatchInfo.CreatedTroubles;
-                updated = true;
-            }
-
-            if (modelPatchInfo.LikedTroubles != null)
-            {
-                user.LikedTroubles = modelPatchInfo.LikedTroubles;
-                updated = true;
             }
 
             if (updated)

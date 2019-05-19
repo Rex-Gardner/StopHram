@@ -9,24 +9,17 @@ namespace ClientModels.Users
     [DataContract]
     public class UserPatchInfo
     {
-        [DataMember(IsRequired = false)]
+        [DataMember(IsRequired = true)]
         [DataType((DataType.Password))]
         public string OldPassword { get; set; }
 
-        [DataMember(IsRequired = false)]
+        [DataMember(IsRequired = true)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [DataMember(IsRequired = false)]
+        [DataMember(IsRequired = true)]
         [Compare("Password", ErrorMessage = "Пароли не совпадают")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
-
-        [DataMember(IsRequired = false)]
-        public IReadOnlyList<Guid> CreatedTroubles { get; set; }
-
-        [DataMember(IsRequired = false)]
-        public IReadOnlyList<Guid> LikedTroubles { get; set; }
-
     }
 }
