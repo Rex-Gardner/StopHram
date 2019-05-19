@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Контроллер аутентификации
+    /// </summary>
     public class AccountController : ControllerBase
     {
         private readonly UserManager<User> userManager;
@@ -41,9 +44,8 @@ namespace API.Controllers
 
             if (clientUserLogin == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientUserLogin));
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             var modelUserLogin = ModelConverters.UserIdentity.UserLoginConverter.Convert(clientUserLogin);

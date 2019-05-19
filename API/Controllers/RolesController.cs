@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Linq;
 using System.Collections.Immutable;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -24,7 +25,7 @@ namespace API.Controllers
         private UserManager<User> userManager;
 
         /// <summary>
-        /// 
+        /// Конструктор контроллера
         /// </summary>
         /// <param name="roleManager">Менеджер ролей</param>
         /// <param name="userManager">Менеджер пользователей</param>
@@ -35,7 +36,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Изменение роли пользователя
         /// </summary>
         /// <param name="userName">Логин пользователя</param>
         /// <param name="clientPatchInfo">Модель изменения пользователя</param>
@@ -43,6 +44,7 @@ namespace API.Controllers
         /// <returns></returns>
         [HttpPatch]
         [Route("{userName}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PatchRoleAsync([FromRoute]string userName, [FromBody] Client.RoleUserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
@@ -68,9 +70,8 @@ namespace API.Controllers
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.UserNotFound(clientPatchInfo.UserId);
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             List<string> modelUserRoles = new List<string>();
@@ -86,9 +87,8 @@ namespace API.Controllers
 
             if (modelUserRoles.Count == 0)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.RoleNotFound(clientPatchInfo.UserRoles.ToString());
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             user.Roles = modelUserRoles;
@@ -98,7 +98,13 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Получение списка ролей
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllRoles(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -111,16 +117,22 @@ namespace API.Controllers
             }
             catch (ArgumentNullException)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.RoleNotFound("roles");
-                //return NotFound(error);
+                return NotFound();
             }
 
             return Ok(clientRoles);
         }
 
+        /// <summary>
+        /// Получение модели роли по названию
+        /// </summary>
+        /// <param name="name">Название роли</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{name}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetRole([FromRoute] string name, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -132,9 +144,8 @@ namespace API.Controllers
             }
             catch (ArgumentNullException)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.RoleNotFound("role");
-                //return NotFound(error);
+                return NotFound();
             }
 
             return Ok(role);

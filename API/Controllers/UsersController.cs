@@ -24,8 +24,14 @@ namespace API.Controllers
             this.userManager = userManager;
         }
 
+        /// <summary>
+        /// Создание пользователя
+        /// </summary>
+        /// <param name="clientCreationInfo">Модель создания пользователя</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [Route("")]
         public async Task<IActionResult> CreateAsync([FromBody] Client.UserCreationInfo clientCreationInfo,
             CancellationToken cancellationToken)
@@ -34,9 +40,8 @@ namespace API.Controllers
             var err = HttpContext;
             if (clientCreationInfo == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.BodyIsMissing(nameof(clientUserInfo));
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             var modelCreationInfo = ModelConverters.Users.UserCreationInfoConverter.Convert(clientCreationInfo);
@@ -44,9 +49,8 @@ namespace API.Controllers
             var user = await userManager.FindByNameAsync(modelCreationInfo.UserName);
             if (user != null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.UserNameAlreadyUse(clientUserInfo.UserName);
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             //
@@ -63,9 +67,8 @@ namespace API.Controllers
             var result = await userManager.CreateAsync(modelUser, modelCreationInfo.Password);
             if (!result.Succeeded)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.ValidationError(result.Errors.First().ToString());
-                //return BadRequest(modelUser);
+                return BadRequest();
             }
 
             await userManager.AddToRoleAsync(modelUser, "user");
@@ -73,9 +76,14 @@ namespace API.Controllers
             return CreatedAtRoute("GetUserRoute", new { userName = clientUser.UserName }, clientUser);
         }
 
+        /// <summary>
+        /// Получение списка полльзователей
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("")]
-        // [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllUsers(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -88,14 +96,19 @@ namespace API.Controllers
             }
             catch (ArgumentNullException)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.UserNotFound("users");
-                //return NotFound(error);
+                return NotFound();
             }
 
             return Ok(clientUsers);
         }
 
+        /// <summary>
+        /// Получение пользователя по логину
+        /// </summary>
+        /// <param name="userName">Логин пользователя</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{userName}", Name = "GetUserRoute")]
         //[Authorize]
@@ -122,8 +135,16 @@ namespace API.Controllers
             return Ok(clientUser);
         }
 
+        /// <summary>
+        /// Модификация пользователя
+        /// </summary>
+        /// <param name="userName">Логин пользователя</param>
+        /// <param name="clientPatchInfo">Модель изменения пользователя</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPatch]
         [Route("{userName}")]
+        
         public async Task<IActionResult> PatchUserAsync([FromRoute] string userName, [FromBody] Client.UserPatchInfo clientPatchInfo,
             CancellationToken cancellationToken)
         {
@@ -136,9 +157,9 @@ namespace API.Controllers
 
             if (clientPatchInfo == null)
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
                 // var error = ServiceErrorResponses.BodyIsMissing(nameof(clientPatchInfo));
-                //return BadRequest(error);
+                return BadRequest();
             }
 
             var modelPatchInfo = ModelConverters.Users.UserPatchInfoConverter.Convert(userName, clientPatchInfo);
@@ -146,7 +167,8 @@ namespace API.Controllers
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                throw new NotImplementedException();
+                //throw new NotImplementedException();
+                return BadRequest();
             }
 
             var updated = false;
@@ -184,28 +206,33 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Удаление пользователя
+        /// </summary>
+        /// <param name="userName">Логин пользователя</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpDelete]
-        //[Authorize]
+        [Authorize]
         [Route("{userName}")]
         public async Task<ActionResult> Delete([FromRoute]string userName, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (userName == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.ValidationError("UserId");
-                //return BadRequest(error);
+                return BadRequest();
             }
+
+            //if(HttpContext.User.IsInRole("admin") || HttpContext.User.Identity.Name)
 
             var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                throw new NotImplementedException();
                 //var error = ServiceErrorResponses.UserNotFound(id);
-                //return NotFound(error);
+                return NotFound();
             }
 
-            //var booking = user.Booking;
             // todo Удалить CreatedTroubles
             var result = await userManager.DeleteAsync(user);
             return NoContent();

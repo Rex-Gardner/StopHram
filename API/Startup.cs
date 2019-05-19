@@ -27,6 +27,9 @@ namespace API
             services.Configure<IdentityOptions>(options =>
             {
                 options.User.RequireUniqueEmail = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
             });
             services.AddIdentityMongoDbProvider<User, Role>(mongo =>
                 mongo.ConnectionString = "mongodb://localhost:27017/UrbanIdentity");
