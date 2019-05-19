@@ -54,7 +54,7 @@ namespace API.Controllers
             if (user != null)
             {
                 var error = Responses.DuplicationError($"User with username {modelCreationInfo.UserName} already use", "User");
-                return BadRequest();
+                return BadRequest(error);
             }
 
             var dateTime = DateTime.UtcNow;
