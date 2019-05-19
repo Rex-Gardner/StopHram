@@ -25,6 +25,8 @@ namespace ModelConverters.Troubles
                 Address = modelTrouble.Address,
                 Tags = modelTrouble.Tags,
                 Status = modelTrouble.Status.ToString(),
+                Author = modelTrouble.Author,
+                LikedUsers = modelTrouble.LikedUsers,
                 CreatedAt = modelTrouble.CreatedAt,
                 LastUpdateAt = modelTrouble.LastUpdateAt
             };
