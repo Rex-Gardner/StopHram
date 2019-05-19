@@ -17,6 +17,7 @@ namespace API.Controllers
     public class TagsController : ControllerBase
     {
         private readonly ITagRepository repository;
+        private const string Target = "Tag";
 
         public TagsController(ITagRepository repository)
         {
@@ -51,7 +52,7 @@ namespace API.Controllers
             }
             catch (TagDuplicationException ex)
             {
-                var error = Responses.DuplicationError(ex.Message, "Tag");
+                var error = Responses.DuplicationError(ex.Message, Target);
                 return BadRequest(error);
             }
 
@@ -93,7 +94,7 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Tag");
+                var error = Responses.NotFoundError(ex.Message, Target);
                 return NotFound(error);
             }
 
@@ -129,7 +130,7 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Tag");
+                var error = Responses.NotFoundError(ex.Message, Target);
                 return NotFound(error);
             }
 
@@ -154,7 +155,7 @@ namespace API.Controllers
             }
             catch (TagNotFoundException ex)
             {
-                var error = Responses.NotFoundError(ex.Message, "Tag");
+                var error = Responses.NotFoundError(ex.Message, Target);
                 return NotFound(error);
             }
 
