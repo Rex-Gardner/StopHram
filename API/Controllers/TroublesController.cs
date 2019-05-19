@@ -252,5 +252,42 @@ namespace API.Controllers
 
             return NoContent();
         }
+        
+        /// <summary>
+        /// Лайкает и убирает лайк с проблемы
+        /// </summary>
+        /// <param name="id">Идентификатор проблемы</param>
+        /// <param name="cancellationToken"></param>
+        [HttpPost]
+        [Route("toggle-like/{id}")]
+        public async Task<IActionResult> ToggleTroubleLikeAsync([FromRoute] string id, 
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var guid = Converter.TroubleConverterUtils.ConvertId(id);
+            var author = HttpContext.User.Identity.Name;
+
+            if (author == null)
+            {
+                var error = Responses.Unauthorized(nameof(author));
+                return Unauthorized(error);
+            }
+            
+            Model.Trouble modelTrouble;
+
+            try
+            {
+                modelTrouble = await troubleRepository.ToggleLikeAsync(guid, author, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (TroubleNotFoundException ex)
+            {
+                var error = Responses.NotFoundError(ex.Message, Target);
+                return BadRequest(error);
+            }
+
+            var clientTrouble = Converter.TroubleConverter.Convert(modelTrouble);
+            return Ok(clientTrouble);
+        }
     }
 }

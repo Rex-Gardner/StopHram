@@ -12,5 +12,6 @@ namespace Models.Troubles.Repositories
         Task<Trouble> GetAsync(Guid id, CancellationToken cancellationToken);
         Task<Trouble> PatchAsync(TroublePatchInfo patchInfo, CancellationToken cancellationToken);
         Task RemoveAsync(Guid id, CancellationToken cancellationToken);
+        Task<Trouble> ToggleLikeAsync(Guid id, string userName, CancellationToken cancellationToken);
     }
 }
