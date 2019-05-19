@@ -260,6 +260,7 @@ namespace API.Controllers
         /// <param name="cancellationToken"></param>
         [HttpPost]
         [Route("toggle-like/{id}")]
+        [Authorize]
         public async Task<IActionResult> ToggleTroubleLikeAsync([FromRoute] string id, 
             CancellationToken cancellationToken)
         {
