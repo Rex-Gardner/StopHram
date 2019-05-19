@@ -46,6 +46,14 @@ namespace API.Controllers
                 return BadRequest(error);
             }
 
+            var author = HttpContext.User.Identity.Name;
+
+            if (author == null)
+            {
+                var error = Responses.Unauthorized(nameof(author));
+                return Unauthorized(error);
+            }
+
             Model.Trouble modelTrouble;
 
             try
@@ -53,7 +61,7 @@ namespace API.Controllers
                 var modelTags = await tagRepository.GetAllAsync(cancellationToken).ConfigureAwait(false);
                 var modelCreationInfo = Converter.TroubleCreationInfoConverter.Convert(creationInfo, modelTags);
                 modelTrouble =
-                    await troubleRepository.CreateAsync(modelCreationInfo, cancellationToken).ConfigureAwait(false);
+                    await troubleRepository.CreateAsync(modelCreationInfo, author, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

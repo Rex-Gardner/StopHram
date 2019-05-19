@@ -103,5 +103,19 @@ namespace API.Helpers
                 }
             };
         }
+
+        public static Response Unauthorized(string target)
+        {
+            return new Response
+            {
+                StatusCode = HttpStatusCode.Unauthorized,
+                ResponseDetails = new ResponseDetails
+                {
+                    Code = ResponseCodes.Unauthorized,
+                    Message = "Access for unauthorized users is prohibited.",
+                    Target = target
+                }
+            };
+        }
     }
 }
